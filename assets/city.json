@@ -1,0 +1,16 @@
+[
+  {
+    "ID": 1,
+    "Name": "Helm",
+    "Rank": "F",
+    "Abandonned": false,
+    "Description": "Start City"
+  },
+  {
+    "ID": 2,
+    "Name": "Vividora",
+    "Rank": "G",
+    "Abandonned": true,
+    "Description": "Abandonned City"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "ID": 1,
+    "Name": "Warrior",
+    "Strength": 5,
+    "Agility": 5,
+    "Intelligence": 5,
+    "Spirit": 0,
+    "Constitution": 5,
+    "Speed": 2,
+    "Description": "short desc"
+  },
+  {
+    "ID": 2,
+    "Name": "Mage",
+    "Strength": 2,
+    "Agility": 5,
+    "Intelligence": 5,
+    "Spirit": 5,
+    "Constitution": 5,
+    "Speed": 3,
+    "Description": "Short desc"
+  }
+]
