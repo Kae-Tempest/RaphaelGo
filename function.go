@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -43,16 +44,30 @@ type StreamsRes struct {
 	} `json:"pagination"`
 }
 
+type TwitchUserRes struct {
+	Data []struct {
+		ID              string    `json:"id"`
+		Login           string    `json:"login"`
+		DisplayName     string    `json:"display_name"`
+		Type            string    `json:"type"`
+		BroadcasterType string    `json:"broadcaster_type"`
+		Description     string    `json:"description"`
+		ProfileImageURL string    `json:"profile_image_url"`
+		OfflineImageURL string    `json:"offline_image_url"`
+		ViewCount       int       `json:"view_count"`
+		Email           string    `json:"email"`
+		CreatedAt       time.Time `json:"created_at"`
+	} `json:"data"`
+}
+
 func Ready(s *discordgo.Session, event *discordgo.Ready) {
 	ticker := time.NewTicker(5 * time.Second)
 	quit := make(chan struct{})
-	//StreamOnLisy := []string
+	var StreamOnList []string
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				// do stuff
-				fmt.Println("tick")
 				clientId := os.Getenv("CLIENT_ID")
 				bearer := os.Getenv("BEARER")
 				clientSecret := os.Getenv("SECRET")
@@ -71,9 +86,8 @@ func Ready(s *discordgo.Session, event *discordgo.Ready) {
 				if err != nil {
 					fmt.Println(err)
 				}
-				var data StreamsRes
-				json.Unmarshal(resBody, &data)
-				fmt.Println("Response body:", data)
+				var StreamRes StreamsRes
+				json.Unmarshal(resBody, &StreamRes)
 
 				if res.StatusCode == 401 {
 					url := fmt.Sprintf(`https://id.twitch.tv/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials`, clientId, clientSecret)
@@ -92,8 +106,48 @@ func Ready(s *discordgo.Session, event *discordgo.Ready) {
 					json.Unmarshal(resBody, &data)
 					os.Setenv("BEARER", data.Token)
 					defer res.Body.Close()
-				}
+				} else if res.StatusCode == 200 {
+					if len(StreamRes.Data) > 0 {
+						isOn := false
+						for u := range StreamOnList {
+							if StreamOnList[u] == StreamRes.Data[u].UserLogin {
+								isOn = true
+							}
+						}
+						if !isOn {
+							StreamOnList = append(StreamOnList, StreamRes.Data[0].UserLogin)
+							url := "https://api.twitch.tv/helix/users?login=kaetempest"
+							req, err := http.NewRequest("GET", url, nil)
+							req.Header.Set("Client-ID", clientId)
+							req.Header.Set("Authorization", "Bearer "+bearer)
+							client := &http.Client{}
+							res, err := client.Do(req)
+							if err != nil {
+								fmt.Println(err)
+							}
+							resBody, err := io.ReadAll(res.Body)
+							if err != nil {
+								fmt.Println(err)
+							}
+							var TUserRes TwitchUserRes
+							json.Unmarshal(resBody, &TUserRes)
+							_, err = s.ChannelMessageSendEmbed("1076795963777220700",
+								&discordgo.MessageEmbed{
+									Author:      &discordgo.MessageEmbedAuthor{Name: StreamRes.Data[0].UserName + " est en stream", IconURL: TUserRes.Data[0].ProfileImageURL},
+									Thumbnail:   &discordgo.MessageEmbedThumbnail{URL: TUserRes.Data[0].ProfileImageURL},
+									Description: StreamRes.Data[0].Title,
+									Fields: []*discordgo.MessageEmbedField{
+										{Name: "Viewers", Value: strconv.Itoa(StreamRes.Data[0].ViewerCount), Inline: true},
+									},
+									Image: &discordgo.MessageEmbedImage{URL: StreamRes.Data[0].ThumbnailURL[:len(StreamRes.Data[0].ThumbnailURL)-20] + "750x450.jpg"},
+								})
+							if err != nil {
+								fmt.Println(err)
+							}
+						}
 
+					}
+				}
 				defer res.Body.Close()
 			case <-quit:
 				ticker.Stop()
