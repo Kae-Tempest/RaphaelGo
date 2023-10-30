@@ -1,6 +1,7 @@
-package main
+package events
 
 import (
+	"RaphaelGo"
 	"RaphaelGo/rpg"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -23,11 +24,11 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	sContent = append(sContent[:0], sContent[1:]...)
 	switch cmd {
 	case "ping":
-		ping(s, m, start)
+		main.ping(s, m, start)
 	case "setup":
 		rpg.Setup(s, m, start, sContent)
 	case "rename":
-		Rename(s, m, start)
+		main.Rename(s, m, start)
 	default:
 		fmt.Println("Command do not exist !")
 	}

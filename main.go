@@ -1,6 +1,7 @@
 package main
 
 import (
+	"RaphaelGo/events"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -20,8 +21,8 @@ func main() {
 
 	d.Identify.Intents = discordgo.IntentsGuildMessages
 
-	d.AddHandler(MessageCreate)
-	d.AddHandler(Ready)
+	d.AddHandler(events.MessageCreate)
+	d.AddHandler(events.Ready)
 
 	err = d.Open()
 	if err != nil {

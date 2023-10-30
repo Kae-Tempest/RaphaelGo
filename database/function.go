@@ -1,4 +1,4 @@
-package rpg
+package database
 
 /*
 import (

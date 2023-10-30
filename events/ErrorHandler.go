@@ -1,4 +1,4 @@
-package main
+package events
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func sendError(s *discordgo.Session, m *discordgo.Message, error string) {
+func sendLogError(s *discordgo.Session, m *discordgo.Message, error string) {
 	_, err := s.ChannelMessageSendEmbed("1076795963777220700",
 		&discordgo.MessageEmbed{
 			Author:      &discordgo.MessageEmbedAuthor{Name: m.Author.Username, IconURL: m.Author.Avatar},
