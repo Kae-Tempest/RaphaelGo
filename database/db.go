@@ -18,7 +18,11 @@ func DB() (DB *pgx.Conn) {
 
 	DB, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to databases: %v\n", err)
+		_, err := fmt.Fprintf(os.Stderr, "Unable to connect to databases: %v\n", err)
+		if err != nil {
+			_ = fmt.Errorf("error while send error msh for connection database: %s", err)
+			return nil
+		}
 		os.Exit(1)
 	} else {
 		fmt.Println("Database Connected !")

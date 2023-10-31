@@ -18,7 +18,7 @@ func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd, m *discor
 	)
 	if err != nil {
 		errMessage := fmt.Errorf("an error as occured when sending embed: %s", err).Error()
-		sendLogError(s, m, errMessage)
+		SendLogError(s, m, errMessage)
 	}
 }
 
@@ -34,6 +34,6 @@ func GuildMemberRemove(s *discordgo.Session, u *discordgo.GuildMemberRemove, m *
 	)
 	if err != nil {
 		errMessage := fmt.Errorf("an error as occured when sending embed: %s", err).Error()
-		sendLogError(s, m, errMessage)
+		SendLogError(s, m, errMessage)
 	}
 }

@@ -1,4 +1,4 @@
-package main
+package Command
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func ping(s *discordgo.Session, m *discordgo.MessageCreate, start time.Time) {
+func Ping(s *discordgo.Session, m *discordgo.Message, start time.Time) {
 	_, err := s.ChannelMessageSend(m.ChannelID, "pong")
 	timeElapsed := time.Since(start)
 	fmt.Println("pinged in", timeElapsed)
@@ -16,7 +16,7 @@ func ping(s *discordgo.Session, m *discordgo.MessageCreate, start time.Time) {
 		return
 	}
 }
-func Rename(s *discordgo.Session, m *discordgo.MessageCreate, start time.Time) {
+func Rename(s *discordgo.Session, m *discordgo.Message, start time.Time) {
 	RoleId, RoleName := SearchRole(s, m, "tempest")
 	err := s.GuildMemberRoleAdd(m.GuildID, m.Author.ID, RoleId)
 	if err != nil {
@@ -32,7 +32,7 @@ func Rename(s *discordgo.Session, m *discordgo.MessageCreate, start time.Time) {
 	timeElapsed := time.Since(start)
 	fmt.Println("pinged in", timeElapsed)
 }
-func SearchRole(s *discordgo.Session, m *discordgo.MessageCreate, researchedRole string) (string, string) {
+func SearchRole(s *discordgo.Session, m *discordgo.Message, researchedRole string) (string, string) {
 	var isBot []string
 	RoleInfo, _ := s.GuildRoles(m.GuildID)
 	GuildMembers, _ := s.GuildMembers(m.GuildID, "", 1000)
