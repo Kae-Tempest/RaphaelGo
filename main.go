@@ -23,6 +23,8 @@ func main() {
 
 	d.AddHandler(events.MessageCreate)
 	d.AddHandler(events.Ready)
+	d.AddHandler(events.GuildMemberAdd)
+	d.AddHandler(events.GuildMemberRemove)
 
 	err = d.Open()
 	if err != nil {
