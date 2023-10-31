@@ -78,7 +78,7 @@ type City struct {
 	ID          int
 	Name        string
 	Rank        string
-	Abandonned  bool
+	Abandoned   bool
 	Description string
 }
 

@@ -1,7 +1,6 @@
 package rpg
 
 import (
-	"RaphaelGo/database"
 	"RaphaelGo/events"
 	"encoding/json"
 	"errors"
@@ -13,8 +12,6 @@ import (
 	"strconv"
 	"time"
 )
-
-var db = database.DB()
 
 func Setup(s *discordgo.Session, m *discordgo.Message, start time.Time, args []string) {
 	timeElapsed := time.Since(start)
@@ -82,7 +79,7 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 	CityFind := false
 	jsonFile, err := os.Open("./assets/city.json")
 	if err != nil {
-		return selectedCity, fmt.Errorf("Error: %s", err)
+		return selectedCity, fmt.Errorf("error: %s", err)
 	}
 	defer func(jsonFile *os.File) {
 		err := jsonFile.Close()
@@ -99,11 +96,11 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 		return City{}, err
 	}
 	for _, city := range Citys {
-		if city.Name == ResearchCity && !city.Abandonned {
+		if city.Name == ResearchCity && !city.Abandoned {
 			selectedCity = city
 			CityFind = true
 			break
-		} else if city.Abandonned {
+		} else if city.Abandoned {
 			_, err := s.ChannelMessageSend(m.ChannelID, "City is abandoned")
 			if err != nil {
 				errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
@@ -130,7 +127,7 @@ func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) 
 	JobFind := false
 	jsonFile, err := os.Open("./assets/job.json")
 	if err != nil {
-		return SelectedJob, fmt.Errorf("Error: %s", err)
+		return SelectedJob, fmt.Errorf("error: %s", err)
 	}
 	defer func(jsonFile *os.File) {
 		err := jsonFile.Close()
