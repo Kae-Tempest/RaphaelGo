@@ -1,9 +1,9 @@
 package rpg
 
 import (
-	"RaphaelGo/Struct"
-	"RaphaelGo/database"
-	"RaphaelGo/events"
+	"RaphaelGo/Packages/HandleError"
+	"RaphaelGo/Packages/Struct"
+	"RaphaelGo/Packages/database"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,33 +15,18 @@ import (
 	"time"
 )
 
-func Setup(s *discordgo.Session, m *discordgo.Message, start time.Time, args []string) {
+func Setup(s *discordgo.Session, m *discordgo.MessageCreate, start time.Time, args []string) {
 	timeElapsed := time.Since(start)
 	if len(args) <= 0 {
 		_, err := s.ChannelMessageSend(m.ChannelID, "Any args passed")
 		if err != nil {
 			errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
-			events.SendLogError(s, m, errMessage)
+			HandleError.SendLogError(s, m, errMessage)
 		}
 		return
 	}
-	JobWanted := args[0]
-	job, err := getJobInfo(JobWanted, m, s)
-	if err != nil {
-		_, err := s.ChannelMessageSend(m.ChannelID, "Any Job find")
-		if err != nil {
-			errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
-			events.SendLogError(s, m, errMessage)
-		}
-	}
-	CityInfo, err := getCityInfo(args[1], m, s)
-	if err != nil {
-		_, err := s.ChannelMessageSend(m.ChannelID, "Any City find")
-		if err != nil {
-			errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
-			events.SendLogError(s, m, errMessage)
-		}
-	}
+	job := database.GetJobByName(s, args[0])
+	CityInfo := database.GetCityByName(s, args[1])
 
 	p := Struct.Player{
 		Username: m.Author.GlobalName,
@@ -71,14 +56,14 @@ func Setup(s *discordgo.Session, m *discordgo.Message, start time.Time, args []s
 		},
 	}
 	// insert Player to db
-	// import cycle ?
-	database.CreatePlayer(p)
-	player := database.GetPlayerById(p.ID)
+	database.CreatePlayer(s, p)
+	player := database.GetPlayerById(s, p.ID)
 	fmt.Println("Player", player)
+	//fmt.Println("Player", p)
 	fmt.Println("pinged in", timeElapsed)
 }
 
-func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session) (Struct.City, error) {
+func getCityInfo(ResearchCity string, m *discordgo.MessageCreate, s *discordgo.Session) (Struct.City, error) {
 	var selectedCity Struct.City
 	CityFind := false
 	jsonFile, err := os.Open("./assets/city.json")
@@ -89,14 +74,14 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 		err := jsonFile.Close()
 		if err != nil {
 			errMessage := fmt.Errorf("error during closing json file: %s", err).Error()
-			events.SendLogError(s, m, errMessage)
+			HandleError.SendLogError(s, m, errMessage)
 		}
 	}(jsonFile)
 	byteValue, _ := io.ReadAll(jsonFile)
 	var Citys []Struct.City
 	err = json.Unmarshal(byteValue, &Citys)
 	if err != nil {
-		events.SendLogError(s, m, fmt.Errorf("parsing error for city: %s", err).Error())
+		HandleError.SendLogError(s, m, fmt.Errorf("parsing error for city: %s", err).Error())
 		return Struct.City{}, err
 	}
 	for _, city := range Citys {
@@ -108,7 +93,7 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 			_, err := s.ChannelMessageSend(m.ChannelID, "City is abandoned")
 			if err != nil {
 				errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
-				events.SendLogError(s, m, errMessage)
+				HandleError.SendLogError(s, m, errMessage)
 				return Struct.City{}, err
 			}
 			return selectedCity, errors.New("abandoned")
@@ -118,7 +103,7 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 		_, err := s.ChannelMessageSend(m.ChannelID, "Any city Found")
 		if err != nil {
 			errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
-			events.SendLogError(s, m, errMessage)
+			HandleError.SendLogError(s, m, errMessage)
 			return Struct.City{}, err
 		}
 		return selectedCity, errors.New("any city found")
@@ -126,7 +111,7 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 	return selectedCity, nil
 }
 
-func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) (Struct.Job, error) {
+func getJobInfo(ResearchJob string, m *discordgo.MessageCreate, s *discordgo.Session) (Struct.Job, error) {
 	var SelectedJob Struct.Job
 	JobFind := false
 	jsonFile, err := os.Open("./assets/job.json")
@@ -137,14 +122,14 @@ func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) 
 		err := jsonFile.Close()
 		if err != nil {
 			errMessage := fmt.Errorf("error during closing json file: %s", err).Error()
-			events.SendLogError(s, m, errMessage)
+			HandleError.SendLogError(s, m, errMessage)
 		}
 	}(jsonFile)
 	byteValue, _ := io.ReadAll(jsonFile)
 	var jobs []Struct.Job
 	err = json.Unmarshal(byteValue, &jobs)
 	if err != nil {
-		events.SendLogError(s, m, fmt.Errorf("parsing error for job: %s", err).Error())
+		HandleError.SendLogError(s, m, fmt.Errorf("parsing error for job: %s", err).Error())
 		return Struct.Job{}, err
 	}
 	for _, job := range jobs {
@@ -158,7 +143,7 @@ func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) 
 		_, err := s.ChannelMessageSend(m.ChannelID, "Any Job Find")
 		if err != nil {
 			errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
-			events.SendLogError(s, m, errMessage)
+			HandleError.SendLogError(s, m, errMessage)
 			return Struct.Job{}, err
 		}
 		return SelectedJob, errors.New("any job find")

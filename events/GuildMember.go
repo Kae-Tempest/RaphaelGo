@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd, m *discordgo.Message) {
+func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd) {
+	var m *discordgo.MessageCreate
 	_, err := s.ChannelMessageSendEmbed("1076795963777220700",
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
@@ -23,7 +24,8 @@ func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd, m *discor
 	}
 }
 
-func GuildMemberRemove(s *discordgo.Session, u *discordgo.GuildMemberRemove, m *discordgo.Message) {
+func GuildMemberRemove(s *discordgo.Session, u *discordgo.GuildMemberRemove) {
+	var m *discordgo.MessageCreate
 	_, err := s.ChannelMessageSendEmbed("1076795963777220700",
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{

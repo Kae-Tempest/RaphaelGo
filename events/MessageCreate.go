@@ -10,25 +10,25 @@ import (
 	"time"
 )
 
-func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate, msg *discordgo.Message) {
+func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	start := time.Now()
 	prefix := os.Getenv("PREFIX")
-	if msg.Author.ID == s.State.User.ID {
+	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	if strings.Contains(msg.Content, prefix) {
-		msg.Content = strings.Replace(msg.Content, prefix, "", 1)
+	if strings.Contains(m.Content, prefix) {
+		m.Content = strings.Replace(m.Content, prefix, "", 1)
 	}
-	sContent := strings.Split(msg.Content, " ")
+	sContent := strings.Split(m.Content, " ")
 	cmd := sContent[0]
 	sContent = append(sContent[:0], sContent[1:]...)
 	switch cmd {
 	case "ping":
-		Command.Ping(s, msg, start)
+		Command.Ping(s, m, start)
 	case "setup":
-		rpg.Setup(s, msg, start, sContent)
+		rpg.Setup(s, m, start, sContent)
 	case "rename":
-		Command.Rename(s, msg, start)
+		Command.Rename(s, m, start)
 	default:
 		fmt.Println("Command do not exist !")
 	}

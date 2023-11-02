@@ -57,7 +57,8 @@ type TwitchUserRes struct {
 	} `json:"data"`
 }
 
-func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
+func Ready(s *discordgo.Session, _ *discordgo.Ready) {
+	var m *discordgo.MessageCreate
 	ticker := time.NewTicker(5 * time.Second)
 	quit := make(chan struct{})
 	var StreamOnList []string

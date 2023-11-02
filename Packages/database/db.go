@@ -3,20 +3,20 @@ package database
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
-
-	"github.com/jackc/pgx/v5"
-	"github.com/joho/godotenv"
 )
 
-func DB() (DB *pgx.Conn) {
+func DB() (DB *pgxpool.Pool) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	DB, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+	//DB, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+	DB, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		_, err := fmt.Fprintf(os.Stderr, "Unable to connect to databases: %v\n", err)
 		if err != nil {
@@ -27,7 +27,5 @@ func DB() (DB *pgx.Conn) {
 	} else {
 		fmt.Println("Database Connected !")
 	}
-	defer DB.Close(context.Background())
-
 	return DB
 }
