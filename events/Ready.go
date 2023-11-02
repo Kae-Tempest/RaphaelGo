@@ -1,6 +1,7 @@
 package events
 
 import (
+	"RaphaelGo/Packages/HandleError"
 	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -56,7 +57,8 @@ type TwitchUserRes struct {
 	} `json:"data"`
 }
 
-func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
+func Ready(s *discordgo.Session, _ *discordgo.Ready) {
+	var m *discordgo.MessageCreate
 	ticker := time.NewTicker(5 * time.Second)
 	quit := make(chan struct{})
 	var StreamOnList []string
@@ -72,7 +74,7 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
 				req, err := http.NewRequest("GET", url, nil)
 				if err != nil {
 					errMessage := fmt.Errorf("new Request error for /helix/streams : %s", err).Error()
-					SendLogError(s, m, errMessage)
+					HandleError.SendLogError(s, m, errMessage)
 				}
 				req.Header.Set("Client-ID", clientId)
 				req.Header.Set("Authorization", "Bearer "+bearer)
@@ -81,18 +83,18 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
 				res, err := client.Do(req)
 				if err != nil {
 					errMessage := fmt.Errorf("new error Do http for /helix/streams: %s", err).Error()
-					SendLogError(s, m, errMessage)
+					HandleError.SendLogError(s, m, errMessage)
 				}
 				resBody, err := io.ReadAll(res.Body)
 				if err != nil {
 					errMessage := fmt.Errorf("new error ResBody for /helix/streanms : %s", err).Error()
-					SendLogError(s, m, errMessage)
+					HandleError.SendLogError(s, m, errMessage)
 				}
 				var StreamRes StreamsRes
 				err = json.Unmarshal(resBody, &StreamRes)
 				if err != nil {
 					errMessage := fmt.Errorf("cannot parse Twitch Stream Response: %s", err).Error()
-					SendLogError(s, m, errMessage)
+					HandleError.SendLogError(s, m, errMessage)
 				}
 
 				if res.StatusCode == 401 {
@@ -100,36 +102,36 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
 					req, err := http.NewRequest("POST", url, nil)
 					if err != nil {
 						errMessage := fmt.Errorf("new Request error for /oauth/token : %s", err).Error()
-						SendLogError(s, m, errMessage)
+						HandleError.SendLogError(s, m, errMessage)
 					}
 					req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					client := &http.Client{}
 					res, err := client.Do(req)
 					if err != nil {
 						errMessage := fmt.Errorf("new error Do http for /oauth/token : %s", err).Error()
-						SendLogError(s, m, errMessage)
+						HandleError.SendLogError(s, m, errMessage)
 					}
 					resBody, err := io.ReadAll(res.Body)
 					if err != nil {
 						errMessage := fmt.Errorf("new error Resbody for /oauth/token : %s", err).Error()
-						SendLogError(s, m, errMessage)
+						HandleError.SendLogError(s, m, errMessage)
 					}
 					var data OAuthRes
 					err = json.Unmarshal(resBody, &data)
 					if err != nil {
 						errMessage := fmt.Errorf("cannot Parse Oauth Twitch Response : %s", err).Error()
-						SendLogError(s, m, errMessage)
+						HandleError.SendLogError(s, m, errMessage)
 					}
 					err = os.Setenv("BEARER", data.Token)
 					if err != nil {
 						errMessage := fmt.Errorf("error appear when set env key BEARER: %s", err).Error()
-						SendLogError(s, m, errMessage)
+						HandleError.SendLogError(s, m, errMessage)
 					}
 					defer func(Body io.ReadCloser) {
 						err := Body.Close()
 						if err != nil {
 							errMessage := fmt.Errorf("error during closing http connection: %s", err).Error()
-							SendLogError(s, m, errMessage)
+							HandleError.SendLogError(s, m, errMessage)
 						}
 					}(res.Body)
 				} else if res.StatusCode == 200 {
@@ -146,7 +148,7 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
 							req, err := http.NewRequest("GET", url, nil)
 							if err != nil {
 								errMessage := fmt.Errorf("new Request error for /helix/users : %s", err).Error()
-								SendLogError(s, m, errMessage)
+								HandleError.SendLogError(s, m, errMessage)
 							}
 							req.Header.Set("Client-ID", clientId)
 							req.Header.Set("Authorization", "Bearer "+bearer)
@@ -155,20 +157,20 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
 							res, err := client.Do(req)
 							if err != nil {
 								errMessage := fmt.Errorf("new error Do http for /helix/users : %s", err).Error()
-								SendLogError(s, m, errMessage)
+								HandleError.SendLogError(s, m, errMessage)
 							}
 
 							resBody, err := io.ReadAll(res.Body)
 							if err != nil {
 								errMessage := fmt.Errorf("new error Resbody for /helix/users : %s", err).Error()
-								SendLogError(s, m, errMessage)
+								HandleError.SendLogError(s, m, errMessage)
 							}
 
 							var TUserRes TwitchUserRes
 							err = json.Unmarshal(resBody, &TUserRes)
 							if err != nil {
 								errMessage := fmt.Errorf("cannot parse Twitch User Response: %s", err).Error()
-								SendLogError(s, m, errMessage)
+								HandleError.SendLogError(s, m, errMessage)
 							}
 
 							_, err = s.ChannelMessageSendEmbed("1076795963777220700",
@@ -183,7 +185,7 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
 								})
 							if err != nil {
 								errMessage := fmt.Errorf("new error for sending EmbedMessage : %s", err).Error()
-								SendLogError(s, m, errMessage)
+								HandleError.SendLogError(s, m, errMessage)
 							}
 						}
 					}
@@ -192,7 +194,7 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready, m *discordgo.Message) {
 					err := Body.Close()
 					if err != nil {
 						errMessage := fmt.Errorf("error during closing http connection: %s", err).Error()
-						SendLogError(s, m, errMessage)
+						HandleError.SendLogError(s, m, errMessage)
 					}
 				}(res.Body)
 			case <-quit:

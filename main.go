@@ -1,6 +1,7 @@
 package main
 
 import (
+	"RaphaelGo/Packages/database"
 	"RaphaelGo/events"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -36,7 +37,7 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
-
+	database.DB().Close()
 	err = d.Close()
 	if err != nil {
 		return

@@ -1,8 +1,8 @@
 package events
 
 import (
-	"RaphaelGo/Command"
-	"RaphaelGo/rpg"
+	"RaphaelGo/Packages/Command"
+	"RaphaelGo/Packages/rpg"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"os"
@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func MessageCreate(s *discordgo.Session, _ *discordgo.MessageCreate, m *discordgo.Message) {
+func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	start := time.Now()
 	prefix := os.Getenv("PREFIX")
 	if m.Author.ID == s.State.User.ID {

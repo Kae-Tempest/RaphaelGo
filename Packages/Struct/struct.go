@@ -1,30 +1,21 @@
-package rpg
+package Struct
 
 type Player struct {
-	ID          int
-	Username    string
-	Level       int
-	EXP         int
-	PO          int
-	Job         string
-	Rank        string
-	Attribut    Attribut
-	Inventory   []Items
-	Equipements Equipements
-	DropRank    DropRank
-	City        City
+	ID        int
+	Username  string
+	Level     int
+	EXP       int
+	PO        int
+	Job       Job
+	Rank      string
+	Attribute Attribute
+	Inventory []Items
+	Equipment Equipements
+	DropRank  DropRank
+	City      City
 }
 
-type Monster struct {
-	ID       int
-	Name     string
-	Rank     string
-	DropedPo int
-	Attribut Attribut
-	Drop     []Items
-}
-
-type Attribut struct {
+type Attribute struct {
 	HP           int
 	MP           int
 	Strength     int
@@ -37,10 +28,10 @@ type Attribut struct {
 }
 
 type Items struct {
-	Name     string
-	Attribut Attribut
-	Quantity int
-	Rank     string
+	Name      string
+	Attribute Attribute
+	Quantity  int
+	Rank      string
 }
 
 type Equipements struct {
@@ -82,11 +73,20 @@ type City struct {
 	Description string
 }
 
-type Dongeon struct {
+type Dungeon struct {
 	ID          int
 	Name        string
 	Rank        string
 	Floor       int
 	InCity      bool
 	Description string
+}
+
+type Monster struct {
+	ID        int
+	Name      string
+	Rank      string
+	DroppedPo int
+	Attribute Attribute
+	Drop      []Items
 }

@@ -1,12 +1,14 @@
 package events
 
 import (
+	"RaphaelGo/Packages/HandleError"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"time"
 )
 
-func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd, m *discordgo.Message) {
+func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd) {
+	var m *discordgo.MessageCreate
 	_, err := s.ChannelMessageSendEmbed("1076795963777220700",
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
@@ -18,11 +20,12 @@ func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd, m *discor
 	)
 	if err != nil {
 		errMessage := fmt.Errorf("an error as occured when sending embed: %s", err).Error()
-		SendLogError(s, m, errMessage)
+		HandleError.SendLogError(s, m, errMessage)
 	}
 }
 
-func GuildMemberRemove(s *discordgo.Session, u *discordgo.GuildMemberRemove, m *discordgo.Message) {
+func GuildMemberRemove(s *discordgo.Session, u *discordgo.GuildMemberRemove) {
+	var m *discordgo.MessageCreate
 	_, err := s.ChannelMessageSendEmbed("1076795963777220700",
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
@@ -34,6 +37,6 @@ func GuildMemberRemove(s *discordgo.Session, u *discordgo.GuildMemberRemove, m *
 	)
 	if err != nil {
 		errMessage := fmt.Errorf("an error as occured when sending embed: %s", err).Error()
-		SendLogError(s, m, errMessage)
+		HandleError.SendLogError(s, m, errMessage)
 	}
 }
