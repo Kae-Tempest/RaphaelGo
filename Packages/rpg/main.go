@@ -1,6 +1,8 @@
 package rpg
 
 import (
+	"RaphaelGo/Struct"
+	"RaphaelGo/database"
 	"RaphaelGo/events"
 	"encoding/json"
 	"errors"
@@ -41,15 +43,15 @@ func Setup(s *discordgo.Session, m *discordgo.Message, start time.Time, args []s
 		}
 	}
 
-	p := &Player{
+	p := Struct.Player{
 		Username: m.Author.GlobalName,
 		Level:    1,
 		EXP:      0,
 		PO:       5,
 		Rank:     "G",
-		Job:      job.Name,
+		Job:      job,
 		City:     CityInfo,
-		Attribut: Attribut{
+		Attribute: Struct.Attribute{
 			HP:           25,
 			MP:           10,
 			Strength:     job.Strength,
@@ -60,7 +62,7 @@ func Setup(s *discordgo.Session, m *discordgo.Message, start time.Time, args []s
 			Speed:        job.Speed,
 			Luck:         rand.Intn(5-1) + 1,
 		},
-		DropRank: DropRank{
+		DropRank: Struct.DropRank{
 			Animals:  strconv.Itoa(rand.Intn(8-1) + 1),
 			Plants:   strconv.Itoa(rand.Intn(8-1) + 1),
 			Minerals: strconv.Itoa(rand.Intn(8-1) + 1),
@@ -69,13 +71,15 @@ func Setup(s *discordgo.Session, m *discordgo.Message, start time.Time, args []s
 		},
 	}
 	// insert Player to db
-	fmt.Println("Job", job)
-	fmt.Println("Player", p)
+	// import cycle ?
+	database.CreatePlayer(p)
+	player := database.GetPlayerById(p.ID)
+	fmt.Println("Player", player)
 	fmt.Println("pinged in", timeElapsed)
 }
 
-func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session) (City, error) {
-	var selectedCity City
+func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session) (Struct.City, error) {
+	var selectedCity Struct.City
 	CityFind := false
 	jsonFile, err := os.Open("./assets/city.json")
 	if err != nil {
@@ -89,11 +93,11 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 		}
 	}(jsonFile)
 	byteValue, _ := io.ReadAll(jsonFile)
-	var Citys []City
+	var Citys []Struct.City
 	err = json.Unmarshal(byteValue, &Citys)
 	if err != nil {
 		events.SendLogError(s, m, fmt.Errorf("parsing error for city: %s", err).Error())
-		return City{}, err
+		return Struct.City{}, err
 	}
 	for _, city := range Citys {
 		if city.Name == ResearchCity && !city.Abandoned {
@@ -105,7 +109,7 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 			if err != nil {
 				errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
 				events.SendLogError(s, m, errMessage)
-				return City{}, err
+				return Struct.City{}, err
 			}
 			return selectedCity, errors.New("abandoned")
 		}
@@ -115,15 +119,15 @@ func getCityInfo(ResearchCity string, m *discordgo.Message, s *discordgo.Session
 		if err != nil {
 			errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
 			events.SendLogError(s, m, errMessage)
-			return City{}, err
+			return Struct.City{}, err
 		}
 		return selectedCity, errors.New("any city found")
 	}
 	return selectedCity, nil
 }
 
-func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) (Job, error) {
-	var SelectedJob Job
+func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) (Struct.Job, error) {
+	var SelectedJob Struct.Job
 	JobFind := false
 	jsonFile, err := os.Open("./assets/job.json")
 	if err != nil {
@@ -137,11 +141,11 @@ func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) 
 		}
 	}(jsonFile)
 	byteValue, _ := io.ReadAll(jsonFile)
-	var jobs []Job
+	var jobs []Struct.Job
 	err = json.Unmarshal(byteValue, &jobs)
 	if err != nil {
 		events.SendLogError(s, m, fmt.Errorf("parsing error for job: %s", err).Error())
-		return Job{}, err
+		return Struct.Job{}, err
 	}
 	for _, job := range jobs {
 		if job.Name == ResearchJob {
@@ -155,7 +159,7 @@ func getJobInfo(ResearchJob string, m *discordgo.Message, s *discordgo.Session) 
 		if err != nil {
 			errMessage := fmt.Errorf("an Error as occurend when sending message").Error()
 			events.SendLogError(s, m, errMessage)
-			return Job{}, err
+			return Struct.Job{}, err
 		}
 		return SelectedJob, errors.New("any job find")
 	}

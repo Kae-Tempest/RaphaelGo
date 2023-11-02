@@ -1,6 +1,7 @@
 package events
 
 import (
+	"RaphaelGo/Packages/HandleError"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"time"
@@ -18,7 +19,7 @@ func GuildMemberAdd(s *discordgo.Session, u *discordgo.GuildMemberAdd, m *discor
 	)
 	if err != nil {
 		errMessage := fmt.Errorf("an error as occured when sending embed: %s", err).Error()
-		SendLogError(s, m, errMessage)
+		HandleError.SendLogError(s, m, errMessage)
 	}
 }
 
@@ -34,6 +35,6 @@ func GuildMemberRemove(s *discordgo.Session, u *discordgo.GuildMemberRemove, m *
 	)
 	if err != nil {
 		errMessage := fmt.Errorf("an error as occured when sending embed: %s", err).Error()
-		SendLogError(s, m, errMessage)
+		HandleError.SendLogError(s, m, errMessage)
 	}
 }

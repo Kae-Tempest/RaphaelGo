@@ -22,3 +22,21 @@ func SendLogError(s *discordgo.Session, m *discordgo.Message, error string) {
 		_ = fmt.Errorf("sending Error Message impossible : %s", err)
 	}
 }
+
+func SendDBError(error string) {
+	var s *discordgo.Session
+	var m *discordgo.Message
+	_, err := s.ChannelMessageSendEmbed("1076795963777220700",
+		&discordgo.MessageEmbed{
+			Title:       "Database Error",
+			Description: error,
+			Timestamp:   time.RFC1123,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text:    "RaphaelGo",
+				IconURL: m.Author.Avatar,
+			},
+		})
+	if err != nil {
+		_ = fmt.Errorf("sending Error Message impossible : %s", err)
+	}
+}
