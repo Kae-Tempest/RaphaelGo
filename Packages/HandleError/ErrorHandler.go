@@ -22,16 +22,15 @@ func SendLogError(s *discordgo.Session, m *discordgo.MessageCreate, error string
 }
 
 func SendDBError(s *discordgo.Session, error string) {
-	fmt.Println(error + " \n")
-	//_, err := s.ChannelMessageSendEmbed("1076795963777220700",
-	//	&discordgo.MessageEmbed{
-	//		Title:       "Database Error",
-	//		Description: error,
-	//		Footer: &discordgo.MessageEmbedFooter{
-	//			Text: "RaphaelGo",
-	//		},
-	//	})
-	//if err != nil {
-	//	_ = fmt.Errorf("sending Error Message impossible : %s", err)
-	//}
+	_, err := s.ChannelMessageSendEmbed("1076795963777220700",
+		&discordgo.MessageEmbed{
+			Title:       "Database Error",
+			Description: error,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: "RaphaelGo",
+			},
+		})
+	if err != nil {
+		_ = fmt.Errorf("sending Error Message impossible : %s", err)
+	}
 }
